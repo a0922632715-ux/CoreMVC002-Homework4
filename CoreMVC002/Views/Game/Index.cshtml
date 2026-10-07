@@ -1,0 +1,55 @@
+﻿@model XAXBEngine
+
+<h2>4A0B猜數字遊戲</h2>
+
+@using (Html.BeginForm("Guess", "Game", FormMethod.Post))
+{
+    <label for="guess">請輸入你的猜測：</label>
+    <input type="text" id="guess" name="Guess" value="@Model.Guess" />
+    <input type="hidden" name="Secret" value="@Model.Secret" />
+    @* 將歷史紀錄隱藏回傳以維持狀態 *@
+    @if (Model.History != null)
+    {
+        for (int i = 0; i < Model.History.Count; i++)
+        {
+            <input type="hidden" name="History" value="@Model.History[i]" />
+        }
+    }
+    <input type="submit" value="猜！" />
+    <input type="submit" name="restart" value="true" formaction='@Url.Action("Guess", "Game")' /> <span>重新開始</span>
+}
+
+@if (!string.IsNullOrEmpty(Model.Result))
+{
+    <p>猜測結果：@Model.Result</p>
+}
+
+<p>累計猜測次數：@Model.Attempts</p>
+
+@if (Model.History != null && Model.History.Count > 0)
+{
+    <h4>歷史紀錄 (最近紀錄於最下方)：</h4>
+    <ul>
+        @foreach (var h in Model.History)
+        {
+            <li>@h</li>
+        }
+    </ul>
+}
+
+@if (ViewBag.GameOver == true)
+{
+    <p><strong>恭喜你猜中！</strong> 是否要重新開始？</p>
+    @using (Html.BeginForm("Guess", "Game", FormMethod.Post))
+    {
+        <input type="hidden" name="Secret" value="@Model.Secret" />
+        @if (Model.History != null)
+        {
+            for (int i = 0; i < Model.History.Count; i++)
+            {
+                <input type="hidden" name="History" value="@Model.History[i]" />
+            }
+        }
+        <input type="submit" name="restart" value="true" />
+    }
+}
